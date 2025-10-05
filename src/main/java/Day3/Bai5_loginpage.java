@@ -7,18 +7,14 @@ import org.openqa.selenium.chrome.ChromeDriver;
 public class Bai5_loginpage {
 
     WebDriver driver;
-
-    // Khai báo locators
     By username = By.id("userName");
     By password = By.id("password");
     By login = By.id("login");
 
-    // Constructor để truyền driver từ bên ngoài
     public Bai5_loginpage(WebDriver driver) {
         this.driver = driver;
     }
 
-    // Hàm login chung
     public void login(String user, String pass) {
         driver.findElement(username).sendKeys(user);
         driver.findElement(password).sendKeys(pass);
