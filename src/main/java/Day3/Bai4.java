@@ -2,48 +2,55 @@ package Day3;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import java.util.List;
+import java.util.Set;
 
 public class Bai4 {
     public static void main(String[] args) throws InterruptedException {
-        WebDriver driver = new ChromeDriver();
         WebDriverManager.chromedriver().setup();
+        WebDriver driver = new ChromeDriver();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
         driver.manage().window().maximize();
         driver.get("https://demoqa.com");
         Thread.sleep(1000);
 
-        WebElement element = driver.findElement(By.xpath("//*[@id=\"app\"]/div/div/div[2]/div/div[1]"));
-        element.click();
+        WebElement alertsFrame = driver.findElement(By.xpath("//*[@id='app']/div/div/div[2]/div/div[3]"));
+        alertsFrame.click();
         Thread.sleep(1000);
 
-        WebElement checkbox1 = driver.findElement(By.xpath("//*[@id=\"item-1\"]"));
-        checkbox1.click();
+        WebElement browser = driver.findElement(By.xpath("//*[@id='item-0']"));
+        browser.click();
         Thread.sleep(1000);
 
-        WebElement homeToggle = driver.findElement(By.xpath("//*[@id='tree-node']/ol/li/span/button"));
-        homeToggle.click();
+        js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
         Thread.sleep(1000);
 
-        WebElement desktopToggle = driver.findElement(By.xpath("//*[@id='tree-node']/ol/li/ol/li[1]/span/button"));
-        desktopToggle.click();
+        WebElement newTabBtn = driver.findElement(By.id("tabButton"));
+        newTabBtn.click();
         Thread.sleep(1000);
 
+        String mainWindow = driver.getWindowHandle();
+        Set<String> allWindows = driver.getWindowHandles();
 
-        List<WebElement> desktopCheckboxes = driver.findElements(
-                By.xpath("//*[@id='tree-node']/ol/li/ol/li[1]/ol/li/span/label/span[@class='rct-checkbox']")
-        );
-
-        for (WebElement checkbox : desktopCheckboxes) {
-            checkbox.click();
-            Thread.sleep(500);
+        for (String win : allWindows) {
+            if (!win.equals(mainWindow)) {
+                driver.switchTo().window(win);
+                WebElement text = driver.findElement(By.id("sampleHeading"));
+                js.executeScript("arguments[0].scrollIntoView(true);", text);
+                js.executeScript("arguments[0].style.border='3px solid red'", text);
+                System.out.println("text ở tab mới: " + text.getText());
+                Thread.sleep(1000);
+                driver.close();
+            }
         }
-        WebElement click1 = driver.findElement(By.xpath("//*[@id=\"tree-node\"]/ol/li/ol/li[2]/span/label/span[1]/svg"));
-        click1.click();
+        driver.switchTo().window(mainWindow);
+        System.out.println("Tiêu đề tab cũ: " + driver.getTitle());
         Thread.sleep(1000);
-        driver.close();
+        driver.quit();
     }
 }
